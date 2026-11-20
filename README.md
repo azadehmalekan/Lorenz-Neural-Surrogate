@@ -1,38 +1,38 @@
 # Neural Surrogate Modeling of the Lorenz System
 
-A data-driven neural surrogate model for learning and reproducing the dynamics of the Lorenz-63 chaotic system.
+**A data-driven neural surrogate model for learning the vector field and reproducing the chaotic dynamics of the Lorenz-63 system.**
 
 ## Overview
 
 This project investigates the use of a neural network to approximate the vector field of the Lorenz-63 system.
 
-A multilayer perceptron (MLP) is trained to predict the time derivatives of the system variables from their current states. The learned vector field is then integrated using a fourth-order Runge–Kutta (RK4) method to generate autonomous trajectories.
+A multilayer perceptron (MLP) is trained to predict the time derivatives of the system variables from their current states. The learned vector field is subsequently integrated using a fourth-order Runge–Kutta (RK4) method to generate autonomous trajectories.
 
-The objective is to evaluate how accurately the neural surrogate reproduces the geometric and dynamical properties of the original chaotic system.
+The main objective is to evaluate whether a neural surrogate can reproduce important geometric, statistical, and dynamical properties of the original chaotic system.
 
 ## 1. The Lorenz System
 
 The Lorenz-63 system is defined by:
 
-\[
-\frac{dx}{dt} = \sigma(y-x)
-\]
+$$
+\frac{dx}{dt}=\sigma(y-x)
+$$
 
-\[
-\frac{dy}{dt} = x(\rho-z)-y
-\]
+$$
+\frac{dy}{dt}=x(\rho-z)-y
+$$
 
-\[
-\frac{dz}{dt} = xy-\beta z
-\]
+$$
+\frac{dz}{dt}=xy-\beta z
+$$
 
 The parameters used in this project are:
 
 | Parameter | Value |
 |---|---:|
-| \(\sigma\) | 10 |
-| \(\rho\) | 28 |
-| \(\beta\) | 8/3 |
+| $\sigma$ | 10 |
+| $\rho$ | 28 |
+| $\beta$ | $8/3$ |
 | Time step | 0.01 |
 | Integration steps | 10,000 |
 | Number of trajectories | 30 |
@@ -41,7 +41,7 @@ The trajectories are generated using the fourth-order Runge–Kutta (RK4) method
 
 ## 2. Dataset Preparation
 
-Thirty independent trajectories are generated from random initial conditions sampled uniformly from the interval [0.5, 2.0] for each state variable.
+Thirty trajectories are generated from random initial conditions sampled uniformly from the interval $[0.5,2.0]$ for each state variable.
 
 The dataset is divided by trajectory:
 
@@ -51,15 +51,15 @@ The dataset is divided by trajectory:
 
 The network inputs are the system states:
 
-\[
+$$
 \mathbf{x}=(x,y,z)
-\]
+$$
 
 The targets are the corresponding derivatives:
 
-\[
+$$
 \mathbf{f}(\mathbf{x})=(\dot{x},\dot{y},\dot{z})
-\]
+$$
 
 Input and target variables are standardized using statistics calculated from the training dataset only.
 
@@ -74,7 +74,7 @@ A fully connected multilayer perceptron is used to approximate the Lorenz vector
 | Hidden layer 2 | 128 neurons, tanh |
 | Output | 3 neurons |
 
-The network is trained using:
+Training configuration:
 
 - Optimizer: Adam
 - Learning rate: 0.001
@@ -85,34 +85,34 @@ The network is trained using:
 
 ## 4. Neural RK4 Integration
 
-After training, the neural network is used as a substitute for the original Lorenz vector field.
+After training, the neural network replaces the original Lorenz vector field during autonomous prediction.
 
-The predicted derivatives are integrated using the RK4 algorithm:
+The predicted derivatives are integrated using RK4:
 
-\[
+$$
 \mathbf{x}_{t+\Delta t}
 =
 \operatorname{RK4}
 \left(
 \mathbf{x}_t,\mathbf{f}_{\theta}
 \right)
-\]
+$$
 
-where \(\mathbf{f}_{\theta}\) denotes the learned neural vector field.
+where $\mathbf{f}_{\theta}$ represents the learned neural vector field.
 
-This approach allows the neural model to generate trajectories without using the original Lorenz equations during the prediction stage.
+This allows the neural model to generate trajectories without evaluating the original Lorenz equations during the prediction stage.
 
 ## 5. Evaluation and Dynamical Analysis
 
-The neural surrogate is evaluated using several complementary approaches.
+The neural surrogate is evaluated through several complementary analyses.
 
 ### One-step derivative prediction
 
-The derivative predictions are evaluated using:
+Prediction performance is evaluated using:
 
 - Mean Squared Error (MSE)
 - Mean Absolute Error (MAE)
-- Coefficient of determination (R²)
+- Coefficient of determination ($R^2$)
 
 ### Attractor reconstruction
 
@@ -120,35 +120,54 @@ The reconstructed neural trajectories are compared with the original Lorenz attr
 
 ### Probability distributions
 
-The probability distributions of x, y, and z are compared between the reference system and the neural surrogate.
+The probability distributions of $x$, $y$, and $z$ are compared between the reference system and the neural surrogate.
 
 ### Autocorrelation functions
 
-Temporal correlations are examined to assess whether the model reproduces the temporal structure of the dynamics.
+Temporal correlations are examined to assess whether the neural model reproduces the temporal structure of the dynamics.
 
 ### Lyapunov exponents
 
 The largest Lyapunov exponent is estimated to investigate sensitivity to initial conditions.
 
-A numerical method based on QR decomposition is also implemented to estimate the full Lyapunov spectrum.
+A QR-based numerical method is also implemented to estimate the full Lyapunov spectrum.
 
 ### Phase-space divergence
 
 The divergence of the learned vector field is calculated using automatic differentiation and compared with the analytical divergence of the original Lorenz system.
 
-For the Lorenz parameters used here:
+For the selected parameters:
 
-\[
-\nabla\cdot\mathbf{f}=-(\sigma+1+\beta)
+$$
+\nabla\cdot\mathbf{f}
+=-(\sigma+1+\beta)
 =-13.6667
-\]
+$$
 
-## 6. Repository Structure
+## 6. Preliminary Results
+
+The following figures illustrate the training process and the comparison between the original Lorenz system and the neural surrogate.
+
+### Training history
+
+![Neural network training history](figures/training_history.png)
+
+### Lorenz attractor reconstruction
+
+![Comparison of true Lorenz and neural RK4 trajectories](figures/trajectory.png)
+
+### Probability distributions
+
+![Probability distribution comparison](figures/lorenz_probability_distributions.png)
+
+## 7. Repository Structure
 
 ```text
 Lorenz-Neural-Surrogate/
 │
 ├── README.md
+├── requirements.txt
+├── .gitignore
 │
 ├── notebooks/
 │   └── lorenz_neural_surrogate.ipynb
@@ -159,59 +178,59 @@ Lorenz-Neural-Surrogate/
     └── lorenz_probability_distributions.png
 ```
 
-## 7. Installation and Usage
+## 8. Installation and Usage
 
 ### Requirements
 
-The project uses Python and the following libraries:
+The project uses Python and the libraries listed in `requirements.txt`.
 
-- NumPy
-- Pandas
-- Matplotlib
-- Scikit-learn
-- TensorFlow
-
-Install the required packages using:
+Install the dependencies:
 
 ```bash
-pip install numpy pandas matplotlib scikit-learn tensorflow
+pip install -r requirements.txt
+```
+
+To install Jupyter Notebook if it is not already available:
+
+```bash
+pip install notebook
 ```
 
 ### Running the project
 
-1. Clone the repository:
+Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Lorenz-Neural-Surrogate.git
+git clone https://github.com/azadehmalekan/Lorenz-Neural-Surrogate.git
 ```
 
-2. Navigate to the repository:
+Navigate to the repository:
 
 ```bash
 cd Lorenz-Neural-Surrogate
 ```
 
-3. Open the Jupyter Notebook:
+Launch Jupyter Notebook:
 
 ```bash
 jupyter notebook notebooks/lorenz_neural_surrogate.ipynb
 ```
 
-4. Run all cells to generate the trajectories, train the neural network, and perform the dynamical analyses.
+Run all cells to generate the trajectories, train the neural network, and perform the dynamical analyses.
 
-## 8. Methodological Note
+## 9. Methodological Note
 
 The derivative targets in this project are computed from the known analytical Lorenz equations at the generated trajectory points.
 
 Therefore, this work investigates supervised neural approximation of a known dynamical vector field. It does not claim to discover unknown governing equations solely from observational data.
 
-## 9. Future Directions
+## 10. Future Directions
 
 Potential extensions include:
 
 - Testing generalization across different Lorenz parameters.
 - Evaluating longer autonomous rollouts.
-- Improving the accuracy of long-term statistical predictions.
+- Improving long-term statistical predictions.
 - Investigating alternative neural network architectures.
 - Applying the methodology to dynamical systems with unknown governing equations.
 
